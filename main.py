@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Optional
 
 import httpx
@@ -16,9 +17,9 @@ logger = logging.getLogger("mp2ne")
 
 app = FastAPI(title="MoviePilot-to-NextEmby Adapter Gateway")
 
-NEXTEMBY_HOST = "https://nf.js.248226785.xyz:8443"
-NEXTEMBY_API_KEY = "your_real_nextemby_api_key"
-MOCK_MOVIEPILOT_TOKEN = "mp_token_for_client_use"
+NEXTEMBY_HOST = os.getenv("NEXTEMBY_HOST", "https://nf.js.248226785.xyz:8443")
+NEXTEMBY_API_KEY = os.getenv("NEXTEMBY_API_KEY", "")
+MOCK_MOVIEPILOT_TOKEN = os.getenv("MOCK_MOVIEPILOT_TOKEN", "mp_token_for_client_use")
 
 
 @app.middleware("http")
@@ -73,6 +74,8 @@ async def check_mp_auth(authorization: Optional[str] = Header(None)):
 
 
 async def _forward_get(path: str, params: dict[str, object]) -> dict:
+    if not NEXTEMBY_API_KEY:
+        raise HTTPException(status_code=500, detail="NEXTEMBY_API_KEY is not configured")
     async with httpx.AsyncClient(timeout=15.0) as client:
         response = await client.get(
             f"{NEXTEMBY_HOST}{path}",
@@ -85,6 +88,8 @@ async def _forward_get(path: str, params: dict[str, object]) -> dict:
 
 
 async def _forward_post(path: str, payload: dict) -> dict:
+    if not NEXTEMBY_API_KEY:
+        raise HTTPException(status_code=500, detail="NEXTEMBY_API_KEY is not configured")
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.post(
             f"{NEXTEMBY_HOST}{path}",
