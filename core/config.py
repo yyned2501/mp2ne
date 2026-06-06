@@ -28,6 +28,7 @@ _load_dotenv_if_present()
 class Settings:
     nextemby_host: str = os.getenv("NEXTEMBY_HOST", "https://nf.js.248226785.xyz:8443")
     nextemby_api_key: str = os.getenv("NEXTEMBY_API_KEY", "")
+    nextemby_session_cookie: str = os.getenv("NEXTEMBY_SESSION_COOKIE", "")
     allow_any_bearer: bool = os.getenv("MP2NE_ALLOW_ANY_BEARER", "1") != "0"
     debug_logging: bool = os.getenv("MP2NE_DEBUG_LOGGING", "1") != "0"
     request_timeout_seconds: float = float(os.getenv("MP2NE_TIMEOUT_SECONDS", "15"))

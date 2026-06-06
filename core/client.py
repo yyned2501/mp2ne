@@ -30,11 +30,12 @@ class NextEmbyClient:
     def __init__(self) -> None:
         self.base_url = settings.nextemby_host.rstrip("/")
         self.api_key = settings.nextemby_api_key
+        self.session_cookie = settings.nextemby_session_cookie
         self.timeout_seconds = settings.request_timeout_seconds
         self.post_timeout_seconds = settings.post_timeout_seconds
 
     def configured(self) -> bool:
-        return bool(self.api_key)
+        return bool(self.api_key or self.session_cookie)
 
     async def get(self, path: str, params: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         if not self.configured():
@@ -48,7 +49,7 @@ class NextEmbyClient:
             response = await client.get(
                 f"{self.base_url}{path}",
                 params=params,
-                headers={"X-API-Key": self.api_key},
+                headers={"Cookie": self.session_cookie} if self.session_cookie else {"X-API-Key": self.api_key},
             )
             if response.status_code != 200:
                 raise httpx.HTTPStatusError(

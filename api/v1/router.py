@@ -477,12 +477,10 @@ async def moviepilot_delete_subscribe_by_mediaid(
     )
 
     payload = {
-        "tmdb_id": str(raw_tmdbid),
-        "title": matched.get("name") if isinstance(matched, dict) else "",
+        "tmdb_id": int(raw_tmdbid),
         "media_type": _normalize_media_type(matched.get("type") if isinstance(matched, dict) else None),
-        "poster_path": matched.get("poster") if isinstance(matched, dict) else "",
     }
-    backend_json = await nextemby_client.post("/api/subscriptions/remove", payload)
+    backend_json = await nextemby_client.post("/api/openapi/subscriptions/remove", payload)
     if isinstance(backend_json, dict) and backend_json.get("success") is False:
         result = MPResponse(
             success=False,
